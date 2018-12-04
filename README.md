@@ -1,5 +1,5 @@
 # ProyectoPython
-##Port scanner
+## Port scanner
 
 El objetivo de este programa es indicar qué puertos TCP se encuentran abiertos en determinado host o grupo de hosts.
 
