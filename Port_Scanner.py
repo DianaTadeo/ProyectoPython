@@ -86,14 +86,13 @@ def guardaRangoPuertos(rango):
 def escanea(hosts,puertos,retraso,v): 	
 	'''
 	Funcion que realiza el escaneo de la lista de hosts en los puertos indicados
-	con un tiempo de retrasodefinido.
+	con un tiempo de retraso definido.
 	hosts: Es una lista de hosts (puede contener solo 1 elemento)
 	puertos: Es una lista de puertos (puede contener solo 1 elemento)
 	retraso: El tiempo de retraso del envio de paquetes
 	v: Identifica si se aplicara la funcion verbose
 	'''
 	try:
-		cliente = socket(AF_INET, SOCK_STREAM)
 		salida=''
 		if v:
 			print 'Se revisan los hosts'
@@ -101,12 +100,14 @@ def escanea(hosts,puertos,retraso,v):
 			ip_host= gethostbyname(host)
 			salida+= 'Host:  %s \n' %(host) 
 			for puerto in puertos:
+				cliente = socket(AF_INET, SOCK_STREAM)
 				resultado = cliente.connect_ex((ip_host, puerto))
+				print host, puerto, resultado
 				if (resultado == 0):
-					salida+= 'puerto %d: Abierto\n' %(puerto) 
+					salida+= 'puerto %d: Abierto\n' %(puerto)
+				cliente.close()
 				sleep(retraso)
 		print salida
-		cliente.close()
 	except Exception as e:
 		printError('Ocurrio un error inesperado')
 		printError(e, True)
@@ -138,6 +139,6 @@ def generaReporte(opciones):
 	
 if __name__ == '__main__':
 	
-	escanea(['84.19.176.42'],[21,22,26],2,True)
+	escanea(['84.19.176.42'],[22,80,443],2,True)
 	
 	
