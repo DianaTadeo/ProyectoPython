@@ -45,17 +45,6 @@ def checaOpciones(opciones):
     if opciones.servers is None:
         printError('Se debe especificar al menos un host, una lista de hosts o un segmento.', True)
 	
-def leeConfiguracion(archivo):
-	'''
-	Funcion que lee un archivo de configuracion para poder realizar el escaneo
-	con la informacion que en ese archivo se encuentre
-	'''
-	try:
-		if v:
-			print 'Se itentan leer el archivo de configuracion'
-	except Exception as e:
-		printError('El archivo de configuracion contiene errores. Por favor revisalo.')
-		printError(e, True)
 		
 def validahosts(hosts):
 		segmento = r'[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/[0-9]{1,2}'
@@ -161,20 +150,25 @@ def leer_opciones_archivo(opciones):
 		Función para extraer las opciones del archivo, el formato del archivo deberá 
 		ser una bandera por renglón y los valores separados por un espacio
 	'''
-	with open(opciones.configure) as file:
-		for line in file:
-			lis = line.split()
-			if lis[0] == '-p':
-				opciones.ports = lis[1]
-			if lis[0] == '-s':
-				opciones.servers = lis[1]
-			if lis[0] == '-o':
-				opciones.report = lis[1]
-			if lis[0] == '-t':
-				opciones.time = lis[1]
-			if lis[0] == '-v':
-				opciones.verbose = True
-	return opciones
+	try:
+		with open(opciones.configure) as file:
+			for line in file:
+				lis = line.split()
+				if lis[0] == '-p':
+					opciones.ports = lis[1]
+				if lis[0] == '-s':
+					opciones.servers = lis[1]
+				if lis[0] == '-o':
+					opciones.report = lis[1]
+				if lis[0] == '-t':
+					opciones.time = lis[1]
+				if lis[0] == '-v':
+					opciones.verbose = True
+		return opciones	
+	except IOError as io:
+		printError('Ocurrio un error inesperado')
+		printError(io, True)
+	
 
 
 if __name__ == '__main__':
