@@ -5,6 +5,7 @@
 #		Hernández González Ricardo O.
 #		Juarez Mendez Jesika.
 #		Tadeo Guillen Diana G.
+
 import sys
 import optparse
 import re
@@ -12,6 +13,7 @@ from socket import *
 from time import sleep
 from datetime import datetime
 import ipcalc #instalar ipcalc
+
 
 def printError(msg, exit = False):
     '''
@@ -21,9 +23,10 @@ def printError(msg, exit = False):
     if exit:
         sys.exit(1)
 
+
 def opciones():
     '''
-	    Funcion que permite agregar las banderas correspondientes para el uso del
+	    Función que permite agregar las banderas correspondientes para el uso del
 	    programa ejecutado como script.
     '''
     parser = optparse.OptionParser()
@@ -36,9 +39,10 @@ def opciones():
     opts,args = parser.parse_args()
     return opts
 
+
 def checaOpciones(opciones):
     '''
-    	Funcion que valida que todas las opciones obligatorias se hayan agregado
+    	Función que valida que todas las opciones obligatorias se hayan agregado
     '''
     if opciones.ports is None:
         printError('Se debe especificar al menos un puerto, lista de puertos o un rango.', True)
@@ -47,20 +51,24 @@ def checaOpciones(opciones):
 	
 		
 def validahosts(hosts):
-		segmento = r'[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/[0-9]{1,2}'
-		lista = r'(.+,.+)+'
-   
-		if re.match(segmento,hosts):
-			  lista_hosts=ipcalc.Network(hosts)
-			  return [str(x) for x in lista_hosts]
-		elif re.match(lista,hosts):
-			    lista_hosts = hosts.replace(' ', ' ')
-			    return lista_hosts.split(',')
-		else:
-		            return [hosts]
+	'''
+		Función para validar si es un solo host, una lista de host, un segmento de host o un rango de host
+	'''
+	segmento = r'[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/[0-9]{1,2}'
+	lista = r'(.+,.+)+'
+	if re.match(segmento,hosts):
+		lista_hosts=ipcalc.Network(hosts)
+		return [str(x) for x in lista_hosts]
+	elif re.match(lista,hosts):
+		lista_hosts = hosts.replace(' ', ' ')
+		return lista_hosts.split(',')
+	else:
+		return [hosts]
+
+
 def validaPuertos(puertos):
 	'''
-		Funcion que devuelve una lista de puertos para cualquier entrada de tipo
+		Función que devuelve una lista de puertos para cualquier entrada de tipo
 		puerto, rango de puertos o lista de ambos
 	'''
 	lista=r'(.+,.+)+'
@@ -79,18 +87,20 @@ def validaPuertos(puertos):
 	else: #Se asume que solo es uno si no entro en las otras, se regresa como una lista de un elemento
 		return [int(puertos)] 
 
+
 def guardaRangoPuertos(rango):
 	'''
-		Funcion auxiliar que genera una lista de puertos a partir
+		Función auxiliar que genera una lista de puertos a partir
 		de un rango en forma de cadena de la forma '23-466'
 	'''
 	inicio=int(rango[:rango.find('-'):])
 	fin=int(rango[rango.find('-')+1::])
 	return [port for port in range(inicio,fin+1)]		
 		
+		
 def escanea(hosts,puertos,retraso,v): 	
 	'''
-		Funcion que realiza el escaneo de la lista de hosts en los puertos indicados
+		Función que realiza el escaneo de la lista de hosts en los puertos indicados
 		con un tiempo de retraso definido.
 		hosts: Es una lista de hosts (puede contener solo 1 elemento)
 		puertos: Es una lista de puertos (puede contener solo 1 elemento)
@@ -123,7 +133,7 @@ def escanea(hosts,puertos,retraso,v):
     
 def generaReporte(opciones,salida):
 	'''
-		Funcion que se encarga de generar el reporte a partir de los resultados
+		Función que se encarga de generar el reporte a partir de los resultados
 	'''
 	if opciones.verbose:
 		print 'Se genera el reporte...'
@@ -131,17 +141,17 @@ def generaReporte(opciones,salida):
 		file.write(str(datetime.now()) + '\n\n')
 		banderas='Las banderas que se usaron: \n'
 		if opciones.ports is not None:
-			banderas+='\t -p  --ports\n'
+			banderas+='\t -p  %s\n' % opciones.ports
 		if opciones.servers is not None:
-			banderas+='\t -s  --servers\n'
+			banderas+='\t -s  %s\n' % opciones.servers
 		if opciones.time is not None:
-			banderas+='\t -t  --time\n'
+			banderas+='\t -t  %d\n' % opciones.time
 		if opciones.verbose is not None:
-			banderas+='\t -v  --verbose\n'
+			banderas+='\t -v  %s\n' % opciones.verbose
 		if opciones.report is not None:
-			banderas+='\t -o  --reporte\n'
+			banderas+='\t -o  %s\n' % opciones.report
 		if opciones.configure is not None:
-			banderas+='\t -c  --configure\n'
+			banderas+='\t -c  %s\n' % opciones.configure
 		file.write(banderas+'\n')
 		file.write(salida)	
 	
@@ -170,6 +180,8 @@ def leer_opciones_archivo(opciones):
 		printError('Ocurrio un error inesperado')
 		printError(io, True)
 
+
+
 if __name__ == '__main__':
 
 	opts = opciones()
@@ -177,5 +189,3 @@ if __name__ == '__main__':
 		opts = leer_opciones_archivo(opts)
 	salida = escanea(validahosts(opts.servers),validaPuertos(opts.ports),opts.time,opts.verbose)
 	generaReporte(opts, salida)
-	
-	
