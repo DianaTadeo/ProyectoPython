@@ -7,6 +7,9 @@
 #		Tadeo Guillen Diana G.
 import sys
 import optparse
+import re
+from socket import *
+from time import sleep
 
 def printError(msg, exit = False):
         sys.stderr.write('Error:\t%s\n' % msg)
@@ -48,36 +51,6 @@ def leeConfiguracion(archivo):
 	except Exception as e:
 		printError('El archivo de configuracion contiene errores. Por favor revisalo.')
 		printError(e, True)
-		
-def leePuertos(puertos,v): #Ya que van a ser uno o varios convendria tomarla como lista
-	'''
-	Funcion que revisa si se paso un solo puerto, una lista de puertos o un rango
-	de puertos.
-	puertos: puerto, lista de puertos o rango de puertos
-	v: Indica si se requiere el modo verboso
-	'''
-	try:
-		if v:
-			print 'Se revisan los puertos'
-	except Exception as e:
-		printError('La entrada de los puertos fue incorrecta')
-		printError(e, True)
-				
-
-def leeHosts(hosts,v): #Ya que van a ser uno o varios convendria tomarla como lista
-	'''
-	Funcion que revisa si se paso un solo host, una lista de hosts o un segmento de
-	red.
-	hosts: Host, lista de host o segmento
-	v: Indica el modo verboso
-	'''
-	try:
-		if v:
-			print 'Se revisan los hosts'
-	except Exception as e:
-		printError('La engtrada de los hosts fue incorrecta')
-		printError(e, True)
-		
 
 def validaPuertos(puertos):
 	'''
@@ -109,17 +82,34 @@ def guardaRangoPuertos(rango):
 	fin=int(rango[rango.find('-')+1::])
 	return [port for port in range(inicio,fin+1)]		
 		
-def buildURL(v,server,protocol = 'http'):
-    '''
-    funcion que construye una url de acuerdo a los valores que se le pasan
-    v: Indica el modo verboso
-    server: la ip del servidor (host)
-	protocol: indica el protocolo de conexi[on
-    '''
-    url = '%s://%s' % (protocol,server)
-    if v:
-		print 'Se obtuvo la URL: '+url+'\n'
-    return url
+def escanea(hosts,puertos,retraso,v): 	
+	'''
+	Funcion que realiza el escaneo de la lista de hosts en los puertos indicados
+	con un tiempo de retrasodefinido.
+	hosts: Es una lista de hosts (puede contener solo 1 elemento)
+	puertos: Es una lista de puertos (puede contener solo 1 elemento)
+	retraso: El tiempo de retraso del envio de paquetes
+	v: Identifica si se aplicara la funcion verbose
+	'''
+	try:
+		cliente = socket(AF_INET, SOCK_STREAM)
+		salida=''
+		if v:
+			print 'Se revisan los hosts'
+		for host in hosts:
+			ip_host= gethostbyname(host)
+			salida+= 'Host:  %s \n' %(host) 
+			for puerto in puertos:
+				resultado = cliente.connect_ex((ip_host, puerto))
+				if (resultado == 0):
+					salida+= 'puerto %d: Abierto\n' %(puerto) 
+				sleep(retraso)
+		print salida
+		cliente.close()
+	except Exception as e:
+		printError('Ocurrio un error inesperado')
+		printError(e, True)
+		
     
 def generaReporte(opciones):
 	'''
@@ -141,5 +131,10 @@ def generaReporte(opciones):
 		banderas+='/t -o  --reporte\n'
 	if opciones.configuracion is not None:
 		banderas+='/t -c  --configure\n'	
+	
+	
+if __name__ == '__main__':
+	
+	escanea(['84.19.176.42'],[21,22,26],2,True)
 	
 	
