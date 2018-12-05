@@ -107,6 +107,7 @@ def escanea(hosts,puertos,retraso,v):
 					salida+= 'puerto %d: Abierto\n' %(puerto)
 				cliente.close()
 				sleep(retraso)
+				cliente.close()
 		print salida
 	except Exception as e:
 		printError('Ocurrio un error inesperado')
