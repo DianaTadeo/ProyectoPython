@@ -146,7 +146,7 @@ def generaReporte(opciones,salida):
 if __name__ == '__main__':
 
 	opts= opciones()
-	salida = escanea(opts.servers.split(','),opts.ports.split(','),opts.time,opts.verbose)
+	salida = escanea(opts.servers.split(','),validaPuertos(opts.ports),opts.time,opts.verbose)
 	generaReporte(opts, salida)
 	
 	
