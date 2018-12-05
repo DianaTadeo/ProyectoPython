@@ -93,7 +93,6 @@ def escanea(hosts,puertos,retraso,v):
 	v: Identifica si se aplicara la funcion verbose
 	'''
 	try:
-		cliente = socket(AF_INET, SOCK_STREAM)
 		salida=''
 		if v:
 			print 'Se revisan los hosts'
@@ -101,12 +100,13 @@ def escanea(hosts,puertos,retraso,v):
 			ip_host= gethostbyname(host)
 			salida+= 'Host:  %s \n' %(host) 
 			for puerto in puertos:
+				cliente = socket(AF_INET, SOCK_STREAM)
 				resultado = cliente.connect_ex((ip_host, puerto))
 				if (resultado == 0):
 					salida+= 'puerto %d: Abierto\n' %(puerto) 
 				sleep(retraso)
+				cliente.close()
 		print salida
-		cliente.close()
 	except Exception as e:
 		printError('Ocurrio un error inesperado')
 		printError(e, True)
