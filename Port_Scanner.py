@@ -23,8 +23,8 @@ def printError(msg, exit = False):
 
 def opciones():
     '''
-    Funcion que permite agregar las banderas correspondientes para el uso del
-    programa ejecutado como script.
+	    Funcion que permite agregar las banderas correspondientes para el uso del
+	    programa ejecutado como script.
     '''
     parser = optparse.OptionParser()
     parser.add_option('-p','--ports', dest='ports', default='80', help='Puerto, lista de puertos rando de puertos o una combinacion de estas opciones.')
@@ -38,7 +38,7 @@ def opciones():
 
 def checaOpciones(opciones):
     '''
-    Funcion que valida que todas las opciones obligatorias se hayan agregado
+    	Funcion que valida que todas las opciones obligatorias se hayan agregado
     '''
     if opciones.ports is None:
         printError('Se debe especificar al menos un puerto, lista de puertos o un rango.', True)
@@ -59,8 +59,8 @@ def validahosts(hosts):
 		            return [hosts]
 def validaPuertos(puertos):
 	'''
-	Funcion que devuelve una lista de puertos para cualquier entrada de tipo
-	puerto, rango de puertos o lista de ambos
+		Funcion que devuelve una lista de puertos para cualquier entrada de tipo
+		puerto, rango de puertos o lista de ambos
 	'''
 	lista=r'(.+,.+)+'
 	rango=r'[0-9]{1,4}-[0-9]{1,4}'
@@ -80,8 +80,8 @@ def validaPuertos(puertos):
 
 def guardaRangoPuertos(rango):
 	'''
-	Funcion auxiliar que genera una lista de puertos a partir
-	de un rango en forma de cadena de la forma '23-466'
+		Funcion auxiliar que genera una lista de puertos a partir
+		de un rango en forma de cadena de la forma '23-466'
 	'''
 	inicio=int(rango[:rango.find('-'):])
 	fin=int(rango[rango.find('-')+1::])
@@ -89,27 +89,29 @@ def guardaRangoPuertos(rango):
 		
 def escanea(hosts,puertos,retraso,v): 	
 	'''
-	Funcion que realiza el escaneo de la lista de hosts en los puertos indicados
-	con un tiempo de retraso definido.
-	hosts: Es una lista de hosts (puede contener solo 1 elemento)
-	puertos: Es una lista de puertos (puede contener solo 1 elemento)
-	retraso: El tiempo de retraso del envio de paquetes
-	v: Identifica si se aplicara la funcion verbose
+		Funcion que realiza el escaneo de la lista de hosts en los puertos indicados
+		con un tiempo de retraso definido.
+		hosts: Es una lista de hosts (puede contener solo 1 elemento)
+		puertos: Es una lista de puertos (puede contener solo 1 elemento)
+		retraso: El tiempo de retraso del envio de paquetes
+		v: Identifica si se aplicara la funcion verbose
 	'''
+	# print hosts,puertos,retraso,v
 	try:
-		print hosts,puertos,retraso,v
 		salida=''
 		if v:
-			print 'Se revisan los hosts'
+			print 'Se revisan los hosts...'
 		for host in hosts:
 			ip_host= gethostbyname(host)
-			salida+= 'Host:  %s \n' %(host) 
+			salida+= '\nHost:  %s \n' %(host) 
 			for puerto in puertos:
 				cliente = socket(AF_INET, SOCK_STREAM)
 				resultado = cliente.connect_ex((ip_host, int(puerto)))
-				print host, puerto, resultado
+				# print host, puerto, resultado
 				if (resultado == 0):
 					salida+= 'puerto %d: Abierto\n' % int(puerto)
+				else:
+					salida+= 'puerto %d: Cerrado\n' % int(puerto)
 				cliente.close()
 				sleep(retraso)
 		return salida
@@ -120,10 +122,10 @@ def escanea(hosts,puertos,retraso,v):
     
 def generaReporte(opciones,salida):
 	'''
-	Funcion que se encarga de generar el reporte a partir de los resultados
+		Funcion que se encarga de generar el reporte a partir de los resultados
 	'''
-	# if opciones.verbose:
-	# 	print 'Se genera el reporte'
+	if opciones.verbose:
+		print 'Se genera el reporte...'
 	with open(opciones.report,"w") as file:
 		file.write(str(datetime.now()) + '\n\n')
 		banderas='Las banderas que se usaron: \n'
@@ -139,7 +141,7 @@ def generaReporte(opciones,salida):
 			banderas+='\t -o  --reporte\n'
 		if opciones.configure is not None:
 			banderas+='\t -c  --configure\n'
-		file.write(banderas)
+		file.write(banderas+'\n')
 		file.write(salida)	
 	
 
@@ -169,7 +171,9 @@ def leer_opciones_archivo(opciones):
 
 if __name__ == '__main__':
 
-	opts= opciones()
+	opts = opciones()
+	if opts.configure:
+		opts = leer_opciones_archivo(opts)
 	salida = escanea(validahosts(opts.servers),validaPuertos(opts.ports),opts.time,opts.verbose)
 	generaReporte(opts, salida)
 	
