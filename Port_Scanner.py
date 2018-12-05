@@ -51,7 +51,8 @@ def validahosts(hosts):
 		lista = r'(.+,.+)+'
    
 		if re.match(segmento,hosts):
-			  return ipcalc.Network(hosts)
+			  lista_hosts=ipcalc.Network(hosts)
+			  return [str(x) for x in lista_hosts]
 		elif re.match(lista,hosts):
 			    lista_hosts = hosts.replace(' ', ' ')
 			    return lista_hosts.split(',')
