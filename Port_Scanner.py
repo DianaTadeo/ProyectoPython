@@ -11,7 +11,7 @@ import re
 from socket import *
 from time import sleep
 from datetime import datetime
-import ipcalc
+import ipcalc #instalar ipcalc
 
 def printError(msg, exit = False):
     '''
@@ -53,7 +53,7 @@ def validahosts(hosts):
 		if re.match(segmento,hosts):
 			  return ipcalc.Network(hosts)
 		elif re.match(lista,hosts):
-			    hosts = hosts.replace(' ', ' ')
+			    lista_hosts = hosts.replace(' ', ' ')
 			    return lista_hosts.split(',')
 		else:
 		            return [hosts]
