@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #Proyecto de Curso Python: Port Scanner
 #Autores:
-#		Hernaandez Ginzalez Ricardo O.
+#		Hernández González Ricardo O.
 #		Juarez Mendez Jesika.
 #		Tadeo Guillen Diana G.
 import sys
@@ -10,14 +10,15 @@ import optparse
 import re
 from socket import *
 from time import sleep
+from datetime import datetime
 
 def printError(msg, exit = False):
-        sys.stderr.write('Error:\t%s\n' % msg)
-        if exit:
-            sys.exit(1)
+    sys.stderr.write('Error:\t%s\n' % msg)
+    if exit:
+        sys.exit(1)
 
 def opciones():
-	 '''
+    '''
     Funcion que permite agregar las banderas correspondientes para el uso del
     programa ejecutado como script.
     '''
@@ -26,13 +27,13 @@ def opciones():
     parser.add_option('-s','--servers', dest='servers', default=None, help='Host, lista de hosts o segmento.')
     parser.add_option('-t','--time', action='store_true', dest='tiempo', default=1, help='Retardo entre paquetes.')
     parser.add_option('-v','--verbose', action='store_true', dest='verbose', default=False, help='Modo verboso.')
-    parser.add_option('-o','--reporte', dest='reporte', default=None, help='Archivo en donde se escribir[a el reporte. De no esar, se mostrara en la salida standard.')
+    parser.add_option('-o','--reporte', dest='reporte', default='reporte.txt', help='Archivo en donde se escribir[a el reporte. De no esar, se mostrara en la salida standard.')
     parser.add_option('-c', '--configure', dest='configuracion', default=None, help='Archivo de configuracion')
     opts,args = parser.parse_args()
     return opts
 
 def checaOpciones(opciones):
-	'''
+    '''
     Funcion que valida que todas las opciones obligatorias se hayan agregado
     '''
     if opciones.ports is None:
@@ -117,20 +118,22 @@ def generaReporte(opciones):
 	'''
 	if opciones.verbose:
 		print 'Se genera el reporte'
-	datos='Hora: '+str(datetime.now())
-	banderas='Las banderas que se usaron: '
-	if opciones.ports is not None:
-		banderas+='\t -p  --ports\n'
-	if opciones.servers is not None:
-		banderas+='\t -s  --servers\n'
-	if opciones.time is not None:
-		banderas+='\t -t  --time\n'
-	if opciones.verbose is not None:
-		banderas+='\t -v  --verbose\n'
-	if opciones.reporte is not None:
-		banderas+='/t -o  --reporte\n'
-	if opciones.configuracion is not None:
-		banderas+='/t -c  --configure\n'	
+	with open(opciones.reporte,"w") as file:
+		file.write(str(datetime.now()) + '\n\n')
+		banderas='Las banderas que se usaron: '
+		if opciones.ports is not None:
+			banderas+='\t -p  --ports\n'
+		if opciones.servers is not None:
+			banderas+='\t -s  --servers\n'
+		if opciones.time is not None:
+			banderas+='\t -t  --time\n'
+		if opciones.verbose is not None:
+			banderas+='\t -v  --verbose\n'
+		if opciones.reporte is not None:
+			banderas+='/t -o  --reporte\n'
+		if opciones.configuracion is not None:
+			banderas+='/t -c  --configure\n'
+		file.write(banderas)	
 	
 	
 if __name__ == '__main__':
