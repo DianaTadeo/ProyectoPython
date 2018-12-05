@@ -79,6 +79,36 @@ def leeHosts(hosts,v): #Ya que van a ser uno o varios convendria tomarla como li
 		printError(e, True)
 		
 
+def validaPuertos(puertos):
+	'''
+	Funcion que devuelve una lista de puertos para cualquier entrada de tipo
+	puerto, rango de puertos o lista de ambos
+	'''
+	lista=r'(.+,.+)+'
+	rango=r'[0-9]{1,4}-[0-9]{1,4}'
+	if re.match(lista,puertos):#Si es una lista de puertos o rangos
+		lista_p= (puertos.replace(' ', '')).split(',')
+		lista_puertos=[]
+		for elemento in lista_p:#Se revisa si hay o no rangos en la lista
+			if re.match(rango,elemento):
+				lista_puertos=lista_puertos+guardaRangoPuertos(elemento)
+			else:
+				lista_puertos.append(int(elemento))
+		return lista_puertos
+	elif re.match(rango,puertos): #si es solo un rango de puertos
+		return guardaRangoPuertos(puertos)
+	else: #Se asume que solo es uno si no entro en las otras, se regresa como una lista de un elemento
+		return [int(puertos)] 
+
+def guardaRangoPuertos(rango):
+	'''
+	Funcion auxiliar que genera una lista de puertos a partir
+	de un rango en forma de cadena de la forma '23-466'
+	'''
+	inicio=int(rango[:rango.find('-'):])
+	fin=int(rango[rango.find('-')+1::])
+	return [port for port in range(inicio,fin+1)]		
+		
 def buildURL(v,server,protocol = 'http'):
     '''
     funcion que construye una url de acuerdo a los valores que se le pasan
