@@ -29,7 +29,7 @@ def opciones():
     parser = optparse.OptionParser()
     parser.add_option('-p','--ports', dest='ports', default='80', help='Puerto, lista de puertos rando de puertos o una combinacion de estas opciones.')
     parser.add_option('-s','--servers', dest='servers', default=None, help='Host, lista de hosts o segmento.')
-    parser.add_option('-t','--time', dest='time', default=1, help='Retardo entre paquetes.')
+    parser.add_option('-t','--time', type='int', dest='time', default=1, help='Retardo entre paquetes.')
     parser.add_option('-v','--verbose', action='store_true', dest='verbose', default=False, help='Modo verboso.')
     parser.add_option('-o','--report', dest='report', default='reporte.txt', help='Archivo en donde se escribira el reporte. De no esar, se mostrara en el archivo "reporte.txt".')
     parser.add_option('-c', '--configure', dest='configure', default=None, help='Archivo de configuracion')
@@ -97,19 +97,20 @@ def escanea(hosts,puertos,retraso,v):
 	v: Identifica si se aplicara la funcion verbose
 	'''
 	try:
-		print hosts,puertos,retraso,v
 		salida=''
 		if v:
-			print 'Se revisan los hosts'
+			print 'Se revisan los hosts...'
 		for host in hosts:
 			ip_host= gethostbyname(host)
 			salida+= 'Host:  %s \n' %(host) 
 			for puerto in puertos:
 				cliente = socket(AF_INET, SOCK_STREAM)
 				resultado = cliente.connect_ex((ip_host, int(puerto)))
-				print host, puerto, resultado
+				# print host, puerto, resultado
 				if (resultado == 0):
 					salida+= 'puerto %d: Abierto\n' % int(puerto)
+				else:
+					salida+= 'puerto %d: Cerrado\n' % int(puerto)
 				cliente.close()
 				sleep(retraso)
 		return salida
@@ -122,30 +123,54 @@ def generaReporte(opciones,salida):
 	'''
 	Funcion que se encarga de generar el reporte a partir de los resultados
 	'''
-	# if opciones.verbose:
-	# 	print 'Se genera el reporte'
+	if opciones.verbose:
+		print 'Se genera el reporte...'
+
 	with open(opciones.report,"w") as file:
 		file.write(str(datetime.now()) + '\n\n')
 		banderas='Las banderas que se usaron: \n'
 		if opciones.ports is not None:
-			banderas+='\t -p  --ports\n'
+			banderas+='\t -p %s\n' % opciones.ports
 		if opciones.servers is not None:
-			banderas+='\t -s  --servers\n'
+			banderas+='\t -s  %s\n' % opciones.servers
 		if opciones.time is not None:
-			banderas+='\t -t  --time\n'
+			banderas+='\t -t  %d\n' % opciones.time
 		if opciones.verbose is not None:
-			banderas+='\t -v  --verbose\n'
+			banderas+='\t -v  %s\n' % opciones.verbose
 		if opciones.report is not None:
-			banderas+='\t -o  --reporte\n'
+			banderas+='\t -o  %s\n' % opciones.report
 		if opciones.configure is not None:
-			banderas+='\t -c  --configure\n'
-		file.write(banderas)
+			banderas+='\t -c  %s\n' % opciones.configure
+		file.write(banderas+'\n')
 		file.write(salida)	
 	
-	
+
+def leer_opciones_archivo(opciones):
+	'''
+		Función para extraer las opciones del archivo, el formato del archivo deberá 
+		ser una bandera por renglón y los valores separados por un espacio
+	'''
+	with open(opciones.configure) as file:
+		for line in file:
+			lis = line.split()
+			if lis[0] == '-p':
+				opciones.ports = lis[1]
+			if lis[0] == '-s':
+				opciones.servers = lis[1]
+			if lis[0] == '-o':
+				opciones.report = lis[1]
+			if lis[0] == '-t':
+				opciones.time = lis[1]
+			if lis[0] == '-v':
+				opciones.verbose = True
+	return opciones
+
+
 if __name__ == '__main__':
 
 	opts= opciones()
+	if opts.configure:
+		opts = leer_opciones_archivo(opts)
 	salida = escanea(opts.servers.split(','),opts.ports.split(','),opts.time,opts.verbose)
 	generaReporte(opts, salida)
 	
