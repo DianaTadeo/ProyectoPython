@@ -20,10 +20,10 @@ pip install ipcalc
 
 ### Correr el programa
 
-- Si se quiere escanear varios puertos en un solo host:
+- Si se quiere escanear varios puertos (con rango de puertos) en un solo host:
 
 ```
-python Port_Scanner.py -s 84.19.176.42 -p 22,80,443,21
+python Port_Scanner.py -s 84.19.176.42 -p 22,80-85,443,21
 ```
 
 - Si se quiere escanear varios host con varios puertos:
