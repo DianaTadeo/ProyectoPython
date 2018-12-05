@@ -56,7 +56,18 @@ def leeConfiguracion(archivo):
 	except Exception as e:
 		printError('El archivo de configuracion contiene errores. Por favor revisalo.')
 		printError(e, True)
-
+		
+def validahosts(hosts):
+		segmento = r'[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/[0-9]{1,2}'
+		lista = r'(.+,.+)+'
+   
+		if re.match(segmento,hosts):
+			  return ipcalc.Network(hosts)
+		elif re.match(lista,hosts):
+			    hosts = hosts.replace(' ', ' ')
+			    return lista_hosts.split(',')
+		else:
+		            return [hosts]
 def validaPuertos(puertos):
 	'''
 	Funcion que devuelve una lista de puertos para cualquier entrada de tipo
