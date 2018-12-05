@@ -11,6 +11,7 @@ import re
 from socket import *
 from time import sleep
 from datetime import datetime
+import ipcalc
 
 def printError(msg, exit = False):
     sys.stderr.write('Error:\t%s\n' % msg)
